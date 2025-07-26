@@ -1,0 +1,106 @@
+@startuml
+' Car Rental System Class Diagram
+
+package "car" {
+  class Car {
+    - String carId
+    - String carName
+    - String licensePlate
+    - CarType carType
+    - CarStatus carStatus
+    + getCarId()
+    + getCarName()
+    + getLicensePlate()
+    + getCarType()
+    + getCarStatus()
+    + setCarStatus(CarStatus)
+  }
+  class LuxuryCar extends Car
+  class NormalCar extends Car
+  enum CarType { LUXURY; NORMAL }
+  enum CarStatus { Avaiable; Booked }
+  class CarFactory {
+    + createcar(...)
+  }
+}
+
+package "Customer" {
+  class Customer {
+    - String customerName
+    - String email
+    - String customerId
+    + getCustomerName()
+    + getEmail()
+    + getCustomerId()
+  }
+}
+
+package "Reservation" {
+  class Reservation {
+    - String reservationId
+    - Customer customer
+    - Car car
+    - LocalDate startDate
+    - LocalDate endDate
+    - double totalCost
+    - ReservationStatus reservationStatus
+    + getReservationId()
+    + getCustomer()
+    + getCar()
+    + getStartDate()
+    + getEndDate()
+    + getTotalCost()
+    + getReservationStatus()
+    + setStartDate(LocalDate)
+    + setEndDate(LocalDate)
+  }
+  enum ReservationStatus { ACTIVE; CANCELLED }
+  class ReservationManager {
+    - Map<String, Reservation> allReservations
+    + createReservation(...)
+    + modifyReservation(...)
+    + cancelReservation(...)
+    + getTotalPrice(...)
+    + getAllReservations()
+  }
+}
+
+package "Payment" {
+  interface Payment {
+    + processPayment()
+  }
+  class CashPayment implements Payment
+  class CreditPayment implements Payment
+}
+
+class CarRentalSystem {
+  - Map<String, Car> availableCars
+  - ReservationManager reservationManager
+  - CarFactory carFactory
+  - Payment paymentProcessor
+  + createCar(Car)
+  + removeCar(String)
+  + searchCar(String, CarType)
+  + getAllCars()
+  + createReservation(...)
+  + modifyReservation(...)
+  + cancelReservation(...)
+  + getTotalPrice(...)
+  + getAllReservations()
+  + processPayment()
+}
+
+' Relationships
+CarRentalSystem --> CarFactory
+CarRentalSystem --> ReservationManager
+CarRentalSystem --> Payment
+CarRentalSystem --> Car
+ReservationManager --> Reservation
+Reservation --> Customer
+Reservation --> Car
+CashPayment ..|> Payment
+CreditPayment ..|> Payment
+LuxuryCar --|> Car
+NormalCar --|> Car
+
+@enduml
