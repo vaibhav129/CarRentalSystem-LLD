@@ -1,65 +1,185 @@
-# Car Rental System - LLD Project
+# 🚗 Car Rental System – Java OOP Project
 
-## Overview
-This is a Java-based Car Rental System designed for Low-Level Design (LLD) interviews. It demonstrates core OOP principles, modular architecture, and basic concurrency handling for car bookings.
+This is a console-based Car Rental System built in Java using Object-Oriented Programming principles like Abstraction, Inheritance, Polymorphism, Encapsulation, and Design Patterns (Singleton, Factory).
 
-## Class Diagram
-The following class diagram describes the core structure. The diagram is written in PlantUML format (`docs/class_diagram.puml`). You can render it using [PlantUML Online](https://www.plantuml.com/plantuml/) or any compatible tool.
+---
 
-```
+## 📌 Project Overview
+
+The Car Rental System allows customers to:
+
+- Search for cars based on name/type
+- View available cars
+- Reserve a car for specific dates
+- Modify or cancel reservations
+- Process payment
+- Ensure car availability across concurrent requests
+
+It supports **concurrent reservation handling**, uses the **Singleton pattern** for system instance control, and provides a **modular, extensible architecture**.
+
+---
+
+## ✅ Features Implemented
+
+| # | Feature | Status |
+|---|---------|--------|
+| 1 | Browse and reserve cars | ✅ |
+| 2 | Store car details (make, model, year, plate, price) | ✅ |
+| 3 | Search by name/type | ✅ |
+| 4 | Reservation management (create, modify, cancel) | ✅ |
+| 5 | Real-time availability status | ✅ |
+| 6 | Customer info (name, license, contact) | ✅ |
+| 7 | Payment handling | ✅ |
+| 8 | Concurrent reservation handling | ✅ (thread-safe) |
+
+---
+
+## 🧱 Class Structure
+
+### ➤ `Car` (Abstract)
+- Fields: `carId`, `name`, `type`, `license`, `basePrice`, `status`
+- Abstract method: `setPrice(days)`
+- Subclasses: `LuxuryCar`, `NormalCar`
+
+### ➤ `CarFactory`
+- Factory to generate car instances based on type
+
+### ➤ `Customer`
+- Holds customer data: name, ID, license info
+
+### ➤ `Reservation`
+- Handles reservation: customer, car, dates, total price
+- Status: Booked / Cancelled
+
+### ➤ `ReservationManager`
+- Maintains all reservations
+- Handles creation, cancellation, modification
+- Performs conflict checking based on dates
+
+### ➤ `Payment` (Interface)
+- `processPayment()`
+- Implemented by `CreditPayment`, etc.
+
+### ➤ `CarRentalSystem` (Singleton)
+- Core logic for creating/searching/reserving cars
+- Manages maps for cars and reservations
+- Thread-safe operations with synchronization
+
+### ➤ `Main`
+- Creates test scenario
+- Runs concurrent threads to simulate multiple users
+
+---
+
+## 📊 Class Diagram (PlantUML)
+
+\`\`\`plantuml
 @startuml
-!include docs/class_diagram.puml
+class Car {
+  - carId : String
+  - carname : String
+  - cartype : CarType
+  - cs : CarStatus
+  - lc : String
+  - bprice : double
+  + setprice(days) : double
+}
+
+abstract class Car
+class LuxuryCar
+class NormalCar
+Car <|-- LuxuryCar
+Car <|-- NormalCar
+
+class CarFactory {
+  + createcar()
+}
+
+class Customer {
+  - name : String
+  - id : String
+  - license : String
+}
+
+class Reservation {
+  - id : String
+  - customer : Customer
+  - car : Car
+  - startDate : LocalDate
+  - endDate : LocalDate
+  - status : ReservationStatus
+}
+
+class ReservationManager {
+  - reservations : Map
+  + createReservation()
+  + cancelReservation()
+  + modifyReservation()
+}
+
+class CarRentalSystem {
+  - instance : CarRentalSystem
+  - allCars : Map
+  - reservations : Map
+  - carFactory : CarFactory
+  - pay : Payment
+  + getInstance()
+  + createCar()
+  + searchCar()
+  + createReservation()
+  + cancelReservation()
+  + totalPrice()
+  + processPayment()
+}
+
+CarRentalSystem --> CarFactory
+CarRentalSystem --> Car
+CarRentalSystem --> ReservationManager
+CarRentalSystem --> Payment
+Reservation --> Customer
+Reservation --> Car
+
+interface Payment
+class CreditPayment
+Payment <|.. CreditPayment
+
 @enduml
-```
+\`\`\`
 
-## Architecture & Packages
+---
 
-- **car/**: Car models, car factory, car types, car status
-- **Customer/**: Customer entity
-- **Reservation/**: Reservation entity, manager, reservation status
-- **Payment/**: Payment interface and implementations
-- **CarRentalSystem/**: Core system logic (Singleton)
-- **Main.java**: Entry point and concurrent booking test
+## ⚙️ Technologies Used
 
-## Class Explanations
+- Java 17
+- Object-Oriented Design
+- PlantUML for class diagram
+- Java's `ConcurrentHashMap` for thread-safe storage
 
-### car/
-- **Car**: Base class for all cars. Contains car ID, name, license plate, type, and status.
-- **LuxuryCar / NormalCar**: Specialized car types extending Car.
-- **CarFactory**: Factory for creating car instances.
-- **CarType**: Enum for car categories (LUXURY, NORMAL).
-- **CarStatus**: Enum for car status (Available, Booked).
+---
 
-### Customer/
-- **Customer**: Represents a customer with name, email, and customer ID.
+## 🚀 How to Run
 
-### Reservation/
-- **Reservation**: Represents a booking, including customer, car, period, cost, and status.
-- **ReservationManager**: Handles creation, modification, and cancellation of reservations. Ensures no double booking.
-- **ReservationStatus**: Enum for reservation state (ACTIVE, CANCELLED).
+1. Clone the repo or copy files into your Java IDE (e.g., IntelliJ, Eclipse).
+2. Make sure packages are properly set (`car`, `Customer`, `Reservation`, `Payment`, etc.)
+3. Run `Main.java`.
 
-### Payment/
-- **Payment (interface)**: Contract for processing payments.
-- **CashPayment / CreditPayment**: Implementations of payment methods.
+---
 
-### CarRentalSystem/
-- **CarRentalSystem**: Singleton class managing cars, reservations, and payments. Entry point for all operations.
+## 🧪 Sample Test – Concurrent Booking
 
-### Main.java
-- **Main**: Demo class with a concurrent booking scenario to test thread safety.
+\`\`\`java
+Thread t1 = new Thread(() -> {
+    system.createReservation(userA, car, date1, date2);
+});
 
-## How to Run
-1. Compile all Java files in `src/`.
-2. Run `Main.java`.
-3. You will see logs for car creation, reservation attempts, and final reservation summary.
+Thread t2 = new Thread(() -> {
+    system.createReservation(userB, car, date1, date2);
+});
 
-## How to Render the Class Diagram
-- Open `docs/class_diagram.puml` in [PlantUML Online](https://www.plantuml.com/plantuml/).
-- Or use any PlantUML-compatible tool to generate a PNG/SVG.
+t1.start();
+t2.start();
+\`\`\`
 
-## GitHub Repository
-This project is to be pushed to: [https://github.com/vaibhav129/CarRentalSystem-LLD.git](https://github.com/vaibhav129/CarRentalSystem-LLD.git)
+✅ If the fix is applied, **only one reservation will succeed** for the same car.
 
-## Author
-- Prepared for LLD interview practice
-- Mentor: Cascade AI
+---
