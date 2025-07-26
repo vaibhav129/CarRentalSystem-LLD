@@ -71,82 +71,78 @@ It supports **concurrent reservation handling**, uses the **Singleton pattern** 
 
 ---
 
-## 📊 Class Diagram (PlantUML)
+## 📊 Class Diagram
 
-\`\`\`plantuml
-@startuml
-class Car {
-  - carId : String
-  - carname : String
-  - cartype : CarType
-  - cs : CarStatus
-  - lc : String
-  - bprice : double
-  + setprice(days) : double
-}
+```mermaid
+classDiagram
+    class Car {
+        -carId : String
+        -carname : String
+        -cartype : CarType
+        -cs : CarStatus
+        -lc : String
+        -bprice : double
+        +setprice(days) : double
+    }
 
-abstract class Car
-class LuxuryCar
-class NormalCar
-Car <|-- LuxuryCar
-Car <|-- NormalCar
+    class CarFactory {
+        +createcar()
+    }
 
-class CarFactory {
-  + createcar()
-}
+    class Customer {
+        -name : String
+        -id : String
+        -license : String
+    }
 
-class Customer {
-  - name : String
-  - id : String
-  - license : String
-}
+    class Reservation {
+        -id : String
+        -customer : Customer
+        -car : Car
+        -startDate : LocalDate
+        -endDate : LocalDate
+        -status : ReservationStatus
+    }
 
-class Reservation {
-  - id : String
-  - customer : Customer
-  - car : Car
-  - startDate : LocalDate
-  - endDate : LocalDate
-  - status : ReservationStatus
-}
+    class ReservationManager {
+        -reservations : Map
+        +createReservation()
+        +cancelReservation()
+        +modifyReservation()
+    }
 
-class ReservationManager {
-  - reservations : Map
-  + createReservation()
-  + cancelReservation()
-  + modifyReservation()
-}
+    class CarRentalSystem {
+        -instance : CarRentalSystem
+        -allCars : Map
+        -reservations : Map
+        -carFactory : CarFactory
+        -pay : Payment
+        +getInstance()
+        +createCar()
+        +searchCar()
+        +createReservation()
+        +cancelReservation()
+        +totalPrice()
+        +processPayment()
+    }
 
-class CarRentalSystem {
-  - instance : CarRentalSystem
-  - allCars : Map
-  - reservations : Map
-  - carFactory : CarFactory
-  - pay : Payment
-  + getInstance()
-  + createCar()
-  + searchCar()
-  + createReservation()
-  + cancelReservation()
-  + totalPrice()
-  + processPayment()
-}
+    class Payment {
+        <<interface>>
+    }
 
-CarRentalSystem --> CarFactory
-CarRentalSystem --> Car
-CarRentalSystem --> ReservationManager
-CarRentalSystem --> Payment
-Reservation --> Customer
-Reservation --> Car
+    class CreditPayment {
+    }
 
-interface Payment
-class CreditPayment
-Payment <|.. CreditPayment
-
-@enduml
-\`\`\`
-
----
+    Car <|-- LuxuryCar
+    Car <|-- NormalCar
+    CarRentalSystem --> CarFactory
+    CarRentalSystem --> Car
+    CarRentalSystem --> ReservationManager
+    CarRentalSystem --> Payment
+    Reservation --> Customer
+    Reservation --> Car
+    Payment <|.. CreditPayment
+```
 
 ## ⚙️ Technologies Used
 
